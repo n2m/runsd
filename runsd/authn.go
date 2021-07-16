@@ -27,5 +27,15 @@ func identityToken(audience string) (string, error) {
 }
 
 func identityTokenFromMetadata(audience string) (string, error) {
-	return queryMetadata("http://metadata.google.internal./computeMetadata/v1/instance/service-accounts/default/identity?audience=" + audience)
+	var (
+		token = getToken(audience)
+		err   error
+	)
+
+	if token == "" {
+		token, err = queryMetadata("http://metadata.google.internal./computeMetadata/v1/instance/service-accounts/default/identity?audience=" + audience)
+		setToken(audience, token)
+	}
+
+	return token, err
 }
