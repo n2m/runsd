@@ -17,6 +17,9 @@ package main
 import (
 	"os"
 	"strings"
+	"time"
+
+	"k8s.io/klog/v2"
 )
 
 func identityToken(audience string) (string, error) {
@@ -27,5 +30,9 @@ func identityToken(audience string) (string, error) {
 }
 
 func identityTokenFromMetadata(audience string) (string, error) {
+	now := time.Now()
+	defer func() {
+		klog.V(1).Infof("metadata duration: %s", time.Since(now).String())
+	}()
 	return queryMetadata("http://metadata.google.internal./computeMetadata/v1/instance/service-accounts/default/identity?audience=" + audience)
 }
